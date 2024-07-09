@@ -2,10 +2,10 @@ makeActiveBinding(".", function() .Last.value, env = globalenv())
 
 
 library(tidyverse)
-d = read_csv("data/intermediate/waves_merged.csv")
+d = read_csv("https://github.com/vupolcom/VU-Election-Study/raw/main/data/intermediate/waves_merged.csv")
 
 #### select media used in content analysis ####
-codebook = read_csv("data/raw/codebook.csv") |>
+codebook = read_csv("https://github.com/vupolcom/VU-Election-Study/raw/main/data/raw/codebook.csv") |>
   mutate(var=str_c(variable, "_", value))
 
 # (1) media_channel_weights: How often is news consumed through each channel?
@@ -104,7 +104,11 @@ media_per_respondent = inner_join(date_waves, media_consumption_weighted, relati
 
 #### Compute media content variables per day/medium ####
 
-net = readxl::read_xlsx("data/raw-private-encrypted/NETcoderingenALLcontrole_final.xlsx") |> 
+dir.create("data/tmp",showWarnings = F)
+download.file("https://github.com/vupolcom/VU-Election-Study/raw/main/data/raw-private-encrypted/NETcoderingenALLcontrole_final.xlsx",
+              "data/tmp/NETcoderingenALLcontrole_final.xlsx")
+
+net = readxl::read_xlsx("data/tmp/NETcoderingenALLcontrole_final.xlsx") |>
   select(publisher, date, type, src, subject, object, dir) |>
   filter(!is.na(type)) |>
   mutate(value=case_match(dir, "p"~1, "n"~ -1, "o" ~ 0))
